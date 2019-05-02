@@ -3,7 +3,6 @@ package svp.lock_service.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import svp.lock_service.models.BaseResponse;
-import svp.lock_service.models.LockRequest;
 import svp.lock_service.zk.ZKManagerImpl;
 
 import java.util.HashMap;
@@ -23,15 +22,40 @@ public class LockController {
     @Autowired
     private ZKManagerImpl zkManager;
 
-    @GetMapping
-    public BaseResponse lookAtLock(@RequestParam(value = "key") String key) {
-        if (zkManager.exists(key)) {
+    @GetMapping("exists")
+    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) {
+        if (zkManager.exists(itemId)) {
             return new BaseResponse(SUCCESS_STATUS, CODE_SUCCESS);
         }
         return new BaseResponse(ERROR_STATUS, AUTH_FAILURE);
     }
 
-    @PostMapping("/lock")
+    @GetMapping("delete")
+    public void DeleteLock(@RequestParam(defaultValue = "true", isLockNeeded = true) final boolean isLockNeeded) {
+        System.out.println("Going to delete path ", itemId);
+        if (isLockNeeded) {
+            zkManager.delete(itemId);
+        }
+    }
+
+    @GetMapping("get")
+    public String  itemId() {
+        if(zkManager.getZNodeData(itemId, true)) {
+            return "lock";
+        }
+        return null;
+    }
+
+    @GetMapping("back")
+    public String GiveLockBack(@RequestParam(defaultValue = "false", isLockNeeded = false) final boolean isLockNeeded) {
+        if (isLockNeeded == true) {
+            return "already locked";
+        }
+        return null;
+    }
+
+
+ /* @PostMapping("/lock")
     public BaseResponse lock(@RequestParam(value = "key") String key, @RequestBody LockRequest request) throws InterruptedException {
         boolean isLockNeeded = request.isLockNeeded();
         locks.computeIfAbsent(key, k -> request.getItemId());
@@ -52,5 +76,5 @@ public class LockController {
                 return new BaseResponse(SUCCESS_STATUS, CODE_SUCCESS);
             }
         }
-    }
+    } */
 }
