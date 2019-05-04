@@ -2,19 +2,27 @@ package svp.lock_service.models;
 
 public class BaseResponse {
 
-    private final String status;
-    private final Integer code;
+    private final Status status;
+    private final String itemId;
 
-    public BaseResponse(String status, Integer code) {
+    public BaseResponse(Status status, String itemId) {
         this.status = status;
-        this.code = code;
+        this.itemId = itemId;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public Integer getCode() {
-        return code;
+    public String getCode() {
+        return itemId;
+    }
+
+    public static BaseResponse getSuccessResponse(String itemId) {
+        return new BaseResponse(Status.SUCCESS, itemId);
+    }
+
+    public static BaseResponse getErrorResponse(String itemId) {
+        return new BaseResponse(Status.ERROR, itemId);
     }
 }
