@@ -15,7 +15,7 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 
 	<dependencies>
@@ -44,7 +44,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>lock_service.LockService</mainClass>
+							<mainClass>svp.lock_service.LockServiceApplication</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
