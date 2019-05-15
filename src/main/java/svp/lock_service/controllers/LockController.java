@@ -1,9 +1,12 @@
 package svp.lock_service.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import svp.lock_service.common.FileUtils;
 import svp.lock_service.models.BaseResponse;
-import svp.lock_service.models.LockRequest;
 import svp.lock_service.zk.ZKManagerImpl;
 
 import java.util.HashMap;
@@ -13,44 +16,51 @@ import java.util.Map;
 @RequestMapping("/locker")
 public class LockController {
 
-    private static final String SUCCESS_STATUS = "success";
-    private static final String ERROR_STATUS = "error";
-    private static final int CODE_SUCCESS = 100;
-    private static final int AUTH_FAILURE = 102;
-
     private Map<String, Object> locks = new HashMap<>();
 
     @Autowired
     private ZKManagerImpl zkManager;
 
-    @GetMapping
-    public BaseResponse lookAtLock(@RequestParam(value = "key") String key) {
-        if (zkManager.exists(key)) {
-            return new BaseResponse(SUCCESS_STATUS, CODE_SUCCESS);
+    /**
+     * Проверить файл на наличиие активной блокировки
+     * @param itemId - путь к файлу, который хочется проверить
+     */
+    @GetMapping("/exists")
+    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) {
+        if (!FileUtils.isFileExists(itemId)) {
+            return BaseResponse.getErrorResponse(itemId);
         }
-        return new BaseResponse(ERROR_STATUS, AUTH_FAILURE);
+        return BaseResponse.getSuccessResponse(itemId);
     }
 
-    @PostMapping("/lock")
-    public BaseResponse lock(@RequestParam(value = "key") String key, @RequestBody LockRequest request) throws InterruptedException {
-        boolean isLockNeeded = request.isLockNeeded();
-        locks.computeIfAbsent(key, k -> request.getItemId());
-
-        if (isLockNeeded) {
-            synchronized (locks.get(key)) {
-                while (zkManager.exists(key)) {
-                    locks.get(key).wait();
-                }
-                zkManager.create(key, request.getItemId());
-                locks.get(key).notifyAll();
-                return new BaseResponse(SUCCESS_STATUS, CODE_SUCCESS);
-            }
-        } else {
-            synchronized (locks.get(key)) {
-                zkManager.delete(key);
-                locks.get(key).notifyAll();
-                return new BaseResponse(SUCCESS_STATUS, CODE_SUCCESS);
-            }
+    /**
+     * Попытаться взять блокировку на файл (временно файл, потом будет таблица в БД)
+     * @param itemId - путь к файлу
+     */
+    @GetMapping("/grab")
+    public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId) {
+        if (!FileUtils.isFileExists(itemId) || hasAlreadyLocked(itemId)) {
+            return BaseResponse.getErrorResponse(itemId);
         }
+        zkManager.create(itemId, itemId);
+        return BaseResponse.getSuccessResponse(itemId);
     }
+
+    /**
+     * Попытаться отдать взятую клиентом блокировку
+     * @param itemId - путь в взятому в блокировку файлу
+     */
+    @GetMapping("/giveback")
+    public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId) {
+        if (!FileUtils.isFileExists(itemId) || !hasAlreadyLocked(itemId)) {
+            return BaseResponse.getErrorResponse(itemId);
+        }
+        zkManager.delete(itemId);
+        return BaseResponse.getSuccessResponse(itemId);
+    }
+
+    private boolean hasAlreadyLocked(String itemId) {
+        return zkManager.exists(itemId);
+    }
+
 }
