@@ -37,6 +37,8 @@ public class LockControllerTest extends Assert {
     private MockMvc mockMvc;
     private static final String localhost = "http://localhost:8080";
     private static final String existsLockByFileEndpoint = "/locker/exists";
+    private static final String grabLockByFileEndpoint = "/locker/grab";
+    private static final String givebackLockByFileEndpoint = "/locker/giveback";
 
     @Before
     public void setUp() {
@@ -52,19 +54,9 @@ public class LockControllerTest extends Assert {
     }
 
 
+    // Zookeper-2
     @Test
-    public void lockExists_NotExistedFile_ExpectError() throws Exception {
-        File file = new File("noexisted.adaf");
-        MvcResult mvcResult = mockMvc.perform(get(localhost + existsLockByFileEndpoint + "?itemId=" + file.getAbsolutePath()))
-                .andReturn();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        BaseResponse responseModel = BaseResponse.fromJSON(content);
-        Assert.assertEquals(Status.ERROR, responseModel.getStatus());
-    }
-
-    @Test
-    public void lockGrabTest_OneGrabsThenAnotherGrabs_ExpectGrabOnFirstAndNotGrabOnSecond() throws Exception {
+    public void lockGrabTest_OneHoldLock_AnotherGrabsSame_ExpectNotGrabOnSecond() throws Exception {
         File file = new File("/");
         MockHttpServletRequestBuilder requestBuilder = get(localhost + existsLockByFileEndpoint + "?itemId=" + file.getAbsolutePath());
         MvcResult resultFirstClient = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
@@ -75,5 +67,46 @@ public class LockControllerTest extends Assert {
         MvcResult resultSecondClient = mockMvc.perform(requestBuilder).andReturn();
         BaseResponse responseModelForSecondClient = BaseResponse.fromJSON(resultSecondClient.getResponse().getContentAsString());
         Assert.assertEquals(Status.ERROR, responseModelForSecondClient.getStatus());
+    }
+
+    // Zookeper-3
+    @Test
+    public void releaseLockTest_OneHoldLock_OneReleaseGrabbedLock_ExpectLockRelease() throws Exception {
+        File file = new File("/");
+        BaseResponse grabResponseModel = lockHelperRequest(file, grabLockByFileEndpoint);
+        Assert.assertEquals(Status.SUCCESS, grabResponseModel.getStatus());
+
+        BaseResponse givebackResponseModel = lockHelperRequest(file, givebackLockByFileEndpoint);
+        Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
+    }
+
+    // Zookeper-4
+    @Test
+    public void releaseNotHoldedLockTest_NoOneHoldLock_OneReleaseUnholdLock_ExpectNoLockReleased() throws Exception {
+        File file = new File("/");
+
+        BaseResponse existsResponseModel = lockHelperRequest(file, existsLockByFileEndpoint);
+
+        if (existsResponseModel.getStatus().equals(Status.SUCCESS)) {
+            BaseResponse givebackResponseModel = lockHelperRequest(file, givebackLockByFileEndpoint);
+            Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
+        }
+
+        BaseResponse givebackResponseModel = lockHelperRequest(file, givebackLockByFileEndpoint);
+        Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
+    }
+
+    // Zookeper-8
+    @Test
+    public void lockExists_NotExistedFile_ExpectError() throws Exception {
+        File file = new File("noexisted.adaf");
+        BaseResponse existsResponse = lockHelperRequest(file, existsLockByFileEndpoint);
+        Assert.assertEquals(Status.ERROR, existsResponse.getStatus());
+    }
+
+    private BaseResponse lockHelperRequest(File file, String endpoint) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = get(localhost + endpoint + "?itemId=" + file.getAbsolutePath());
+        MvcResult mvcResult = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
+        return BaseResponse.fromJSON(mvcResult.getResponse().getContentAsString());
     }
 }
