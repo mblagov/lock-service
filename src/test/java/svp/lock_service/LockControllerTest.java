@@ -57,28 +57,22 @@ public class LockControllerTest extends Assert {
     @Test
     public void accessFileTest_NoOneHoldLock_OneAccessesFile_ExpectSuccessfulAccess() throws Exception {
         File file = new File("/");
-        MockHttpServletRequestBuilder requestBuilder = get(localhost + grabLockByFileEndpoint + "?itemId=" + file.getAbsolutePath());
-        MvcResult resultClient = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
-        BaseResponse responseModelForClient = BaseResponse.fromJSON(resultClient.getResponse().getContentAsString());
+        BaseResponse responseModelForClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForClient.getStatus());
     }
 
-    // Zookeper-2
+    // Zookeeper-2
     @Test
     public void lockGrabTest_OneHoldLock_AnotherGrabsSame_ExpectNotGrabOnSecond() throws Exception {
         File file = new File("/");
-        MockHttpServletRequestBuilder requestBuilder = get(localhost + existsLockByFileEndpoint + "?itemId=" + file.getAbsolutePath());
-        MvcResult resultFirstClient = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
-
-        BaseResponse responseModelForFirstClient = BaseResponse.fromJSON(resultFirstClient.getResponse().getContentAsString());
+        BaseResponse responseModelForFirstClient = lockHelperRequest(file, existsLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForFirstClient.getStatus());
 
-        MvcResult resultSecondClient = mockMvc.perform(requestBuilder).andReturn();
-        BaseResponse responseModelForSecondClient = BaseResponse.fromJSON(resultSecondClient.getResponse().getContentAsString());
+        BaseResponse responseModelForSecondClient = lockHelperRequest(file, existsLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, responseModelForSecondClient.getStatus());
     }
 
-    // Zookeper-3
+    // Zookeeper-3
     @Test
     public void releaseLockTest_OneHoldLock_OneReleaseGrabbedLock_ExpectLockRelease() throws Exception {
         File file = new File("/");
@@ -89,7 +83,7 @@ public class LockControllerTest extends Assert {
         Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
     }
 
-    // Zookeper-4
+    // Zookeeper-4
     @Test
     public void releaseNotHoldedLockTest_NoOneHoldLock_OneReleaseUnholdLock_ExpectNoLockReleased() throws Exception {
         File file = new File("/");
@@ -105,7 +99,7 @@ public class LockControllerTest extends Assert {
         Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
     }
 
-    // Zookeper-8
+    // Zookeeper-8
     @Test
     public void lockExists_NotExistedFile_ExpectError() throws Exception {
         File file = new File("noexisted.adaf");
