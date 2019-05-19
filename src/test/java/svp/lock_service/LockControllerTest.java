@@ -53,11 +53,11 @@ public class LockControllerTest extends Assert {
         Assert.assertNotNull(webApplicationContext.getBean(LockControllerImpl.class));
     }
 
-    // Zookeper-1
+    // Zookeeper-1
     @Test
     public void accessFileTest_NoOneHoldLock_OneAccessesFile_ExpectSuccessfulAccess() throws Exception {
         File file = new File("/");
-        MockHttpServletRequestBuilder requestBuilder = get(localhost + existsLockByFileEndpoint + "?itemId=" + file.getAbsolutePath());
+        MockHttpServletRequestBuilder requestBuilder = get(localhost + grabLockByFileEndpoint + "?itemId=" + file.getAbsolutePath());
         MvcResult resultClient = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
         BaseResponse responseModelForClient = BaseResponse.fromJSON(resultClient.getResponse().getContentAsString());
         Assert.assertEquals(Status.SUCCESS, responseModelForClient.getStatus());
