@@ -12,7 +12,7 @@ public class TableUtils {
             e.printStackTrace();
             System.exit(1);
         }
-        Connection con = DriverManager.getConnection("jdbc:hive2://localhost:10000/default", "student", "student");
+        Connection con = DriverManager.getConnection("jdbc:hive2://localhost:10000/default", "students", "students");
         DatabaseMetaData metadata = con.getMetaData();
         ResultSet res = metadata.getTables(null, null, tableName, null);
         return res.next();
