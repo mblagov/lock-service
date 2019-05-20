@@ -57,6 +57,8 @@ public class LockControllerTest {
     @Test
     public void accessFileTest_NoOneHoldLock_OneAccessesFile_ExpectSuccessfulAccess() throws Exception {
         File file = new File("/");
+        lockHelperRequest(file, givebackLockByFileEndpoint);
+
         BaseResponse responseModelForClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForClient.getStatus());
     }
@@ -65,10 +67,10 @@ public class LockControllerTest {
     @Test
     public void lockGrabTest_OneHoldLock_AnotherGrabsSame_ExpectNotGrabOnSecond() throws Exception {
         File file = new File("/");
-        BaseResponse responseModelForFirstClient = lockHelperRequest(file, existsLockByFileEndpoint);
+        BaseResponse responseModelForFirstClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForFirstClient.getStatus());
 
-        BaseResponse responseModelForSecondClient = lockHelperRequest(file, existsLockByFileEndpoint);
+        BaseResponse responseModelForSecondClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, responseModelForSecondClient.getStatus());
     }
 
