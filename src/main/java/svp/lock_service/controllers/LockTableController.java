@@ -5,41 +5,38 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import svp.lock_service.common.FileUtils;
+import svp.lock_service.common.TableUtils;
 import svp.lock_service.models.BaseResponse;
 import svp.lock_service.zk.ZKManagerImpl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.*;
 
 @RestController
-@RequestMapping("/locker")
-public class LockController {
-
-    private Map<String, Object> locks = new HashMap<>();
-
+@RequestMapping("/tableLocker")
+public class LockTableController {
     @Autowired
     private ZKManagerImpl zkManager;
+    private static String driverName = "org.apache.hive.jdbc.HiveDriver";
 
     /**
-     * Проверить файл на наличиие активной блокировки
-     * @param itemId - путь к файлу, который хочется проверить
+     * Проверить таблицу на наличиие активной блокировки
+     * @param itemId - имя таблице, которую мы хотим проверить
      */
     @GetMapping("/exists")
-    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) {
-        if (!FileUtils.isFileExists(itemId)) {
+    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) throws SQLException {
+        if(!TableUtils.isTableExists(itemId)){
             return BaseResponse.getErrorResponse(itemId);
         }
         return BaseResponse.getSuccessResponse(itemId);
     }
 
     /**
-     * Попытаться взять блокировку на файл (временно файл, потом будет таблица в БД)
-     * @param itemId - путь к файлу
+     * Попытаться взять блокировку на таблицу
+     * @param itemId - имя таблицы
      */
     @GetMapping("/grab")
-    public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId) {
-        if (!FileUtils.isFileExists(itemId) || hasAlreadyLocked(itemId)) {
+    public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId) throws SQLException{
+        if (!TableUtils.isTableExists(itemId) || hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
         zkManager.create(itemId, itemId);
@@ -48,11 +45,11 @@ public class LockController {
 
     /**
      * Попытаться отдать взятую клиентом блокировку
-     * @param itemId - путь в взятому в блокировку файлу
+     * @param itemId - имя заблокированной таблицы
      */
     @GetMapping("/giveback")
-    public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId) {
-        if (!FileUtils.isFileExists(itemId) || !hasAlreadyLocked(itemId)) {
+    public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId) throws SQLException {
+        if (!TableUtils.isTableExists(itemId) || !hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
         zkManager.delete(itemId);
@@ -62,5 +59,4 @@ public class LockController {
     private boolean hasAlreadyLocked(String itemId) {
         return zkManager.exists(itemId);
     }
-
 }
