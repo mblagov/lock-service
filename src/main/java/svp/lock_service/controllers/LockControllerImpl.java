@@ -21,7 +21,7 @@ public class LockControllerImpl implements LockFileController {
 
 
     public BaseResponse lookAtLock(String itemId) {
-        if (FileUtils.isFileExists(itemId)) {
+        if (!FileUtils.isFileExists(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
         return BaseResponse.getSuccessResponse(itemId);
