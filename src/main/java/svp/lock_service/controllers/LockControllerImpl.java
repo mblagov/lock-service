@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/locker")
-public class LockControllerImpl implements LockController {
+public class LockControllerImpl implements LockFileController {
 
     private Map<String, Object> locks = new HashMap<>();
 

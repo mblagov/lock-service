@@ -4,10 +4,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import svp.lock_service.models.BaseResponse;
 
-public interface LockController {
+public interface LockFileController {
 
     /**
      * Проверить файл на наличиие активной блокировки
+     *
      * @param itemId - путь к файлу, который хочется проверить
      */
     @GetMapping("/exists")
@@ -15,6 +16,7 @@ public interface LockController {
 
     /**
      * Попытаться взять блокировку на файл
+     *
      * @param itemId - путь к файлу
      */
     @GetMapping("/grab")
@@ -22,6 +24,7 @@ public interface LockController {
 
     /**
      * Попытаться отдать взятую клиентом блокировку
+     *
      * @param itemId - путь в взятому в блокировку файлу
      */
     @GetMapping("/giveback")
