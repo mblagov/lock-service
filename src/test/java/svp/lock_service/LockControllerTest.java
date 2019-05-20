@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {LockServiceApplication.class})
 @WebAppConfiguration(value = "")
 @SpringBootTest
-public class LockControllerTest extends Assert {
+public class LockControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
