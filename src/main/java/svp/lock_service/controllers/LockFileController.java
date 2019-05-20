@@ -14,7 +14,7 @@ public interface LockController {
     public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId);
 
     /**
-     * Попытаться взять блокировку на файл (временно файл, потом будет таблица в БД)
+     * Попытаться взять блокировку на файл
      * @param itemId - путь к файлу
      */
     @GetMapping("/grab")
