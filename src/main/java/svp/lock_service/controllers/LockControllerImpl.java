@@ -18,7 +18,6 @@ import java.net.URISyntaxException;
 public class LockControllerImpl implements LockFileController {
 
     private static final String HDFS_NODENAME_PORT = "hdfs://n56:8020";
-    private static final String FS_DEFAULT_NAME = "fs.defaultFS";
 
     @Autowired
     private ZKManagerImpl zkManager;
@@ -28,7 +27,6 @@ public class LockControllerImpl implements LockFileController {
     public LockControllerImpl() throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
         conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
-//        conf.set(FS_DEFAULT_NAME, HDFS_NODENAME_PORT);
         fileSystem = FileSystem.get(new URI(HDFS_NODENAME_PORT), conf);
     }
 
@@ -37,6 +35,7 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getSuccessResponse(itemId);
         }
 
+        itemId = remakeFilePath(itemId);
         if (zkManager.exists(itemId)) {
             return BaseResponse.getSuccessResponse(itemId);
         } else {
@@ -53,6 +52,8 @@ public class LockControllerImpl implements LockFileController {
         if (hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
+
+        itemId = remakeFilePath(itemId);
         zkManager.create(itemId, itemId);
         return BaseResponse.getSuccessResponse(itemId);
     }
@@ -67,8 +68,20 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getErrorResponse(itemId);
         }
 
+        itemId = remakeFilePath(itemId);
         zkManager.delete(itemId);
         return BaseResponse.getSuccessResponse(itemId);
+    }
+
+    private String remakeFilePath(String originalPath) {
+        String[] pathParts = originalPath.split("/");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("/");
+
+        for (String pathPart : pathParts) {
+            stringBuilder.append(pathPart);
+        }
+        return stringBuilder.toString();
     }
 
     private boolean hasAlreadyLocked(String itemId) {
