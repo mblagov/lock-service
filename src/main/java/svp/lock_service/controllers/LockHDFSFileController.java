@@ -13,8 +13,8 @@ public interface LockHDFSFileController {
      *
      * @param itemId - путь к файлу, который хочется проверить
      */
-    @GetMapping("/exists")
-    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) throws IOException;
+    @GetMapping("/checkfree")
+    public BaseResponse isLockFree(@RequestParam(value = "itemId") String itemId) throws IOException;
 
     /**
      * Попытаться взять блокировку на файл

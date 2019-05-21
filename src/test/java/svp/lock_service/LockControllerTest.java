@@ -35,7 +35,7 @@ public class LockControllerTest {
 
     private MockMvc mockMvc;
     private static final String localhost = "http://localhost:8080";
-    private static final String existsLockByFileEndpoint = "/locker/exists";
+    private static final String existsLockByFileEndpoint = "/locker/checkfree";
     private static final String grabLockByFileEndpoint = "/locker/grab";
     private static final String givebackLockByFileEndpoint = "/locker/giveback";
 
@@ -90,11 +90,11 @@ public class LockControllerTest {
     // Zookeeper-4
     @Test
     public void releaseNotHoldedLockTest_NoOneHoldLock_OneReleaseUnholdLock_ExpectNoLockReleased() throws Exception {
-        BaseResponse existsResponseModel = lockHelperRequest(hdfsTestPath, existsLockByFileEndpoint);
+        BaseResponse checkLockFreeModelResponse = lockHelperRequest(hdfsTestPath, existsLockByFileEndpoint);
 
-        if (existsResponseModel.getStatus().equals(Status.SUCCESS)) {
+        if (checkLockFreeModelResponse.getStatus().equals(Status.ERROR)) {
             BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
-            Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getComment());
+            Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
         }
 
         BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);

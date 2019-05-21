@@ -16,6 +16,7 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
     public static final String FILE_DOESN_T_EXIST_ON_HDFS = "File doesn't exist on HDFS";
     public static final String FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE = "File already locked by someone else";
+    public static final String FILE_ISN_T_LOCKED = "File isn't locked";
 
     @Autowired
     private ZKManagerImpl zkManager;
@@ -26,7 +27,7 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
         hdfsHelper = new HdfsHelper();
     }
 
-    public BaseResponse lookAtLock(String itemId) throws IOException {
+    public BaseResponse isLockFree(String itemId) throws IOException {
         if (!hdfsHelper.isFileExistsInHDFS(itemId)) {
             return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
@@ -62,7 +63,7 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
         String zookeeperNodePath = remakeFilePath(itemId);
         if (!hasAlreadyLocked(zookeeperNodePath)) {
-            return BaseResponse.getErrorResponse(itemId, FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE);
+            return BaseResponse.getErrorResponse(itemId, FILE_ISN_T_LOCKED);
         }
 
         zkManager.delete(zookeeperNodePath);
