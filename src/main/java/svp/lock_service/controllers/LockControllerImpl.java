@@ -82,7 +82,7 @@ public class LockControllerImpl implements LockFileController {
     }
 
     private boolean isFileExistsInHDFS(String path) throws IOException {
-        return !fileSystem.exists(new Path(path));
+        return fileSystem.exists(new Path(path));
     }
 
 }
