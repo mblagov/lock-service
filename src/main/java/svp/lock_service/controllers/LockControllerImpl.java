@@ -36,7 +36,7 @@ public class LockControllerImpl implements LockFileController {
         }
 
         itemId = remakeFilePath(itemId);
-        if (zkManager.exists(itemId)) {
+        if (hasAlreadyLocked(itemId)) {
             return BaseResponse.getSuccessResponse(itemId);
         } else {
             return BaseResponse.getErrorResponse(itemId);
@@ -49,11 +49,11 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getSuccessResponse(itemId);
         }
 
+        itemId = remakeFilePath(itemId);
         if (hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
 
-        itemId = remakeFilePath(itemId);
         zkManager.create(itemId, itemId);
         return BaseResponse.getSuccessResponse(itemId);
     }
@@ -64,11 +64,11 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getSuccessResponse(itemId);
         }
 
+        itemId = remakeFilePath(itemId);
         if (!hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
 
-        itemId = remakeFilePath(itemId);
         zkManager.delete(itemId);
         return BaseResponse.getSuccessResponse(itemId);
     }
@@ -79,7 +79,7 @@ public class LockControllerImpl implements LockFileController {
         stringBuilder.append("/");
 
         for (String pathPart : pathParts) {
-            stringBuilder.append(pathPart);
+            stringBuilder.append(pathPart).append("-");
         }
         return stringBuilder.toString();
     }
