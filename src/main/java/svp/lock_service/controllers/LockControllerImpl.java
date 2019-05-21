@@ -12,7 +12,6 @@ import svp.lock_service.zk.ZKManagerImpl;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
@@ -54,8 +53,6 @@ public class LockControllerImpl implements LockFileController {
         }
 
         itemId = remakeFilePath(itemId);
-
-        logger.log(Level.INFO, itemId);
 
         if (hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);

@@ -98,7 +98,7 @@ public class LockControllerTest {
         }
 
         BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
-        Assert.assertEquals(Status.ERROR, givebackResponseModel.getStatus());
+        Assert.assertEquals(Status.ERROR.name(), givebackResponseModel.getItemId());
     }
 
     // Zookeeper-8
