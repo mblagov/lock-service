@@ -16,7 +16,7 @@ import java.io.IOException;
 public class LockControllerImpl implements LockFileController {
 
     private static final String HDFS_NODENAME_PORT = "hdfs://n56:8020";
-    private static final String FS_DEFAULT_NAME = "fs.default.name";
+    private static final String FS_DEFAULT_NAME = "fs.defaultFS";
 
     @Autowired
     private ZKManagerImpl zkManager;
