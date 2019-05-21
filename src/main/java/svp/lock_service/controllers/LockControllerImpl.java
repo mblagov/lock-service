@@ -49,12 +49,12 @@ public class LockControllerImpl implements LockFileController {
 
     public BaseResponse grabLock(String itemId) throws IOException {
         if (!isFileExistsInHDFS(itemId)) {
-            return BaseResponse.getSuccessResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId);
         }
 
         String newPath = remakeFilePath(itemId);
         if (hasAlreadyLocked(newPath)) {
-            return BaseResponse.getErrorResponse(newPath);
+            return BaseResponse.getErrorResponse(itemId);
         }
 
         zkManager.create(newPath, newPath);
@@ -64,15 +64,15 @@ public class LockControllerImpl implements LockFileController {
 
     public BaseResponse giveLockBack(String itemId) throws IOException {
         if (!isFileExistsInHDFS(itemId)) {
-            return BaseResponse.getSuccessResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId);
         }
 
         String newPath = remakeFilePath(itemId);
         if (!hasAlreadyLocked(newPath)) {
-            return BaseResponse.getErrorResponse(newPath);
+            return BaseResponse.getErrorResponse(itemId);
         }
 
-        zkManager.delete(itemId);
+        zkManager.delete(newPath);
         return BaseResponse.getSuccessResponse(newPath);
     }
 

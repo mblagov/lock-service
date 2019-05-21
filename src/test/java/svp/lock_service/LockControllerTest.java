@@ -39,7 +39,7 @@ public class LockControllerTest {
     private static final String grabLockByFileEndpoint = "/locker/grab";
     private static final String givebackLockByFileEndpoint = "/locker/giveback";
 
-    private String hdfsTestPath = "/user/students/kafka-reader/text.txt";
+    private String hdfsTestPath = "hdfs://n56:8020/user/students/kafka-reader/text.txt";
 
     @Before
     public void setUp() {
@@ -98,7 +98,7 @@ public class LockControllerTest {
         }
 
         BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
-        Assert.assertEquals(Status.ERROR.name(), givebackResponseModel.getItemId());
+        Assert.assertEquals(Status.ERROR.name(), givebackResponseModel.getStatus());
     }
 
     // Zookeeper-8
