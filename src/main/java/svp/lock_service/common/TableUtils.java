@@ -3,6 +3,7 @@ package svp.lock_service.common;
 import java.sql.*;
 
 public class TableUtils {
+
     private static String driverName = "org.apache.hive.jdbc.HiveDriver";
 
     public static boolean isTableExists(String tableName) throws SQLException {

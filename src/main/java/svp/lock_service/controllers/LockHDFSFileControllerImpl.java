@@ -14,9 +14,9 @@ import java.net.URISyntaxException;
 @RequestMapping("/locker")
 public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
-    public static final String FILE_DOESN_T_EXIST_ON_HDFS = "File doesn't exist on HDFS";
-    public static final String FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE = "File already locked by someone else";
-    public static final String FILE_ISN_T_LOCKED = "File isn't locked";
+    private static final String FILE_DOESN_T_EXIST_ON_HDFS = "File doesn't exist on HDFS";
+    private static final String FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE = "File already locked by someone else";
+    private static final String FILE_ISN_T_LOCKED = "File isn't locked";
 
     @Autowired
     private ZKManagerImpl zkManager;
