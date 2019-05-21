@@ -52,14 +52,13 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getSuccessResponse(itemId);
         }
 
-        itemId = remakeFilePath(itemId);
-
-        if (hasAlreadyLocked(itemId)) {
-            return BaseResponse.getErrorResponse(itemId);
+        String newPath = remakeFilePath(itemId);
+        if (hasAlreadyLocked(newPath)) {
+            return BaseResponse.getErrorResponse(newPath);
         }
 
-        zkManager.create(itemId, itemId);
-        return BaseResponse.getSuccessResponse(itemId);
+        zkManager.create(newPath, newPath);
+        return BaseResponse.getSuccessResponse(newPath);
     }
 
 
@@ -68,16 +67,18 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getSuccessResponse(itemId);
         }
 
-        itemId = remakeFilePath(itemId);
-        if (!hasAlreadyLocked(itemId)) {
-            return BaseResponse.getErrorResponse(itemId);
+        String newPath = remakeFilePath(itemId);
+        if (!hasAlreadyLocked(newPath)) {
+            return BaseResponse.getErrorResponse(newPath);
         }
 
         zkManager.delete(itemId);
-        return BaseResponse.getSuccessResponse(itemId);
+        return BaseResponse.getSuccessResponse(newPath);
     }
 
     private String remakeFilePath(String originalPath) {
+        originalPath = originalPath.substring(1, originalPath.length() - 1);
+
         String[] pathParts = originalPath.split("/");
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("/");
