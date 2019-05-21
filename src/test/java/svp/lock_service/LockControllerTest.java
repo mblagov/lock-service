@@ -94,7 +94,7 @@ public class LockControllerTest {
 
         if (existsResponseModel.getStatus().equals(Status.SUCCESS)) {
             BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
-            Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
+            Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getComment());
         }
 
         BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
