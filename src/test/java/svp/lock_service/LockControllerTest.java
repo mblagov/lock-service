@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import svp.lock_service.controllers.LockControllerImpl;
 import svp.lock_service.models.BaseResponse;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {LockServiceApplication.class})
 @WebAppConfiguration(value = "")
+@Transactional
 @SpringBootTest
 public class LockControllerTest {
 
@@ -61,6 +63,8 @@ public class LockControllerTest {
 
         BaseResponse responseModelForClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForClient.getStatus());
+
+//        cleanUpGrabbedLock(file);
     }
 
     // Zookeeper-2
@@ -72,6 +76,8 @@ public class LockControllerTest {
 
         BaseResponse responseModelForSecondClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, responseModelForSecondClient.getStatus());
+
+//        cleanUpGrabbedLock(file);
     }
 
     // Zookeeper-3
@@ -113,5 +119,13 @@ public class LockControllerTest {
         MockHttpServletRequestBuilder requestBuilder = get(localhost + endpoint + "?itemId=" + file.getAbsolutePath());
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
         return BaseResponse.fromJSON(mvcResult.getResponse().getContentAsString());
+    }
+
+    private void cleanUpGrabbedLock(File file) {
+        try {
+            lockHelperRequest(file, givebackLockByFileEndpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
