@@ -1,57 +1,53 @@
 package svp.lock_service.controllers;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import svp.lock_service.common.HdfsHelper;
 import svp.lock_service.models.BaseResponse;
 import svp.lock_service.zk.ZKManagerImpl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/locker")
-public class LockControllerImpl implements LockFileController {
+public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
-    private static final String HDFS_NODENAME_PORT = "hdfs://n56:8020";
+    public static final String FILE_DOESN_T_EXIST_ON_HDFS = "File doesn't exist on HDFS";
+    public static final String FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE = "File already locked by someone else";
 
     @Autowired
     private ZKManagerImpl zkManager;
 
-    private FileSystem fileSystem;
+    private HdfsHelper hdfsHelper;
 
-    public LockControllerImpl() throws IOException, URISyntaxException {
-        Configuration conf = new Configuration();
-        conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
-        fileSystem = FileSystem.get(new URI(HDFS_NODENAME_PORT), conf);
+    public LockHDFSFileControllerImpl() throws IOException, URISyntaxException {
+        hdfsHelper = new HdfsHelper();
     }
 
     public BaseResponse lookAtLock(String itemId) throws IOException {
-        if (!isFileExistsInHDFS(itemId)) {
-            return BaseResponse.getErrorResponse(itemId);
+        if (!hdfsHelper.isFileExistsInHDFS(itemId)) {
+            return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
         String zookeeperNodePath = remakeFilePath(itemId);
         if (hasAlreadyLocked(zookeeperNodePath)) {
-            return BaseResponse.getErrorResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId, "File is locked");
         } else {
-            return BaseResponse.getErrorResponse(itemId);
+            return BaseResponse.getSuccessResponse(itemId);
         }
     }
 
 
     public BaseResponse grabLock(String itemId) throws IOException {
-        if (!isFileExistsInHDFS(itemId)) {
-            return BaseResponse.getErrorResponse(itemId);
+        if (!hdfsHelper.isFileExistsInHDFS(itemId)) {
+            return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
         String zookeeperNodePath = remakeFilePath(itemId);
         if (hasAlreadyLocked(zookeeperNodePath)) {
-            return BaseResponse.getErrorResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId, FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE);
         }
 
         zkManager.create(zookeeperNodePath, zookeeperNodePath);
@@ -60,13 +56,13 @@ public class LockControllerImpl implements LockFileController {
 
 
     public BaseResponse giveLockBack(String itemId) throws IOException {
-        if (!isFileExistsInHDFS(itemId)) {
-            return BaseResponse.getErrorResponse(itemId);
+        if (!hdfsHelper.isFileExistsInHDFS(itemId)) {
+            return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
         String zookeeperNodePath = remakeFilePath(itemId);
         if (!hasAlreadyLocked(zookeeperNodePath)) {
-            return BaseResponse.getErrorResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId, FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE);
         }
 
         zkManager.delete(zookeeperNodePath);
@@ -80,9 +76,4 @@ public class LockControllerImpl implements LockFileController {
     private boolean hasAlreadyLocked(String itemId) {
         return zkManager.exists(itemId);
     }
-
-    private boolean isFileExistsInHDFS(String path) throws IOException {
-        return fileSystem.exists(new Path(path));
-    }
-
 }

@@ -6,7 +6,7 @@ import svp.lock_service.models.BaseResponse;
 
 import java.io.IOException;
 
-public interface LockFileController {
+public interface LockHDFSFileController {
 
     /**
      * Проверить файл на наличиие активной блокировки

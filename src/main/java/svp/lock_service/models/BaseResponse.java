@@ -6,6 +6,7 @@ public class BaseResponse {
 
     private Status status;
     private String itemId;
+    private String comment;
 
     public static BaseResponse fromJSON(String jsonString) {
         JSONObject jsonObject = new JSONObject(jsonString);
@@ -13,15 +14,17 @@ public class BaseResponse {
 
         baseResponse.status = Status.valueOf(jsonObject.getString("status"));
         baseResponse.itemId = jsonObject.getString("itemId");
+        baseResponse.comment = jsonObject.getString("comment");
         return baseResponse;
     }
 
     public BaseResponse() {
     }
 
-    public BaseResponse(Status status, String itemId) {
+    public BaseResponse(Status status, String itemId, String comment) {
         this.status = status;
         this.itemId = itemId;
+        this.comment = comment;
     }
 
     public Status getStatus() {
@@ -40,11 +43,27 @@ public class BaseResponse {
         return itemId;
     }
 
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public static BaseResponse getSuccessResponse(String itemId) {
-        return new BaseResponse(Status.SUCCESS, itemId);
+        return new BaseResponse(Status.SUCCESS, itemId, "");
     }
 
     public static BaseResponse getErrorResponse(String itemId) {
-        return new BaseResponse(Status.ERROR, itemId);
+        return getErrorResponse(itemId, "");
+    }
+
+    public static BaseResponse getErrorResponse(String itemId, String comment) {
+        return new BaseResponse(Status.ERROR, itemId, comment);
     }
 }

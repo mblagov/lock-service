@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import svp.lock_service.controllers.LockControllerImpl;
+import svp.lock_service.controllers.LockHDFSFileControllerImpl;
 import svp.lock_service.models.BaseResponse;
 import svp.lock_service.models.Status;
 
@@ -51,7 +51,7 @@ public class LockControllerTest {
         ServletContext servletContext = webApplicationContext.getServletContext();
         Assert.assertNotNull(servletContext);
         Assert.assertTrue(servletContext instanceof MockServletContext);
-        Assert.assertNotNull(webApplicationContext.getBean(LockControllerImpl.class));
+        Assert.assertNotNull(webApplicationContext.getBean(LockHDFSFileControllerImpl.class));
     }
 
     // Zookeeper-1
