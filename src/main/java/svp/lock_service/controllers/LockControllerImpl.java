@@ -24,7 +24,12 @@ public class LockControllerImpl implements LockFileController {
         if (!FileUtils.isFileExists(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
-        return BaseResponse.getSuccessResponse(itemId);
+
+        if (zkManager.exists(itemId)) {
+            return BaseResponse.getSuccessResponse(itemId);
+        } else {
+            return BaseResponse.getErrorResponse(itemId);
+        }
     }
 
 
