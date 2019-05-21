@@ -10,6 +10,8 @@ import svp.lock_service.models.BaseResponse;
 import svp.lock_service.zk.ZKManagerImpl;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/locker")
@@ -23,10 +25,10 @@ public class LockControllerImpl implements LockFileController {
 
     private FileSystem fileSystem;
 
-    public LockControllerImpl() throws IOException {
+    public LockControllerImpl() throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
-        conf.set(FS_DEFAULT_NAME, HDFS_NODENAME_PORT);
-        fileSystem = FileSystem.get(conf);
+//        conf.set(FS_DEFAULT_NAME, HDFS_NODENAME_PORT);
+        fileSystem = FileSystem.get(new URI(HDFS_NODENAME_PORT), conf);
     }
 
     public BaseResponse lookAtLock(String itemId) throws IOException {
