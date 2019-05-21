@@ -27,6 +27,7 @@ public class LockControllerImpl implements LockFileController {
 
     public LockControllerImpl() throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
+        conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
 //        conf.set(FS_DEFAULT_NAME, HDFS_NODENAME_PORT);
         fileSystem = FileSystem.get(new URI(HDFS_NODENAME_PORT), conf);
     }
