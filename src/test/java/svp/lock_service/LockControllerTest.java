@@ -62,11 +62,11 @@ public class LockControllerTest {
         BaseResponse responseModelForClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForClient.getStatus());
 
-//        cleanUpGrabbedLock(file);
+        cleanUpGrabbedLock(file);
     }
 
     // Zookeeper-2
-    /*@Test
+    @Test
     public void lockGrabTest_OneHoldLock_AnotherGrabsSame_ExpectNotGrabOnSecond() throws Exception {
         File file = new File("/home");
         BaseResponse responseModelForFirstClient = lockHelperRequest(file, grabLockByFileEndpoint);
@@ -75,7 +75,7 @@ public class LockControllerTest {
         BaseResponse responseModelForSecondClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, responseModelForSecondClient.getStatus());
 
-//        cleanUpGrabbedLock(file);
+        cleanUpGrabbedLock(file);
     }
 
     // Zookeeper-3
@@ -102,7 +102,7 @@ public class LockControllerTest {
         }
 
         BaseResponse givebackResponseModel = lockHelperRequest(file, givebackLockByFileEndpoint);
-        Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
+        Assert.assertEquals(Status.ERROR, givebackResponseModel.getStatus());
     }
 
     // Zookeeper-8
@@ -111,7 +111,7 @@ public class LockControllerTest {
         File file = new File("noexisted.adaf");
         BaseResponse existsResponse = lockHelperRequest(file, existsLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, existsResponse.getStatus());
-    }*/
+    }
 
     private BaseResponse lockHelperRequest(File file, String endpoint) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get(localhost + endpoint + "?itemId=" + file.getAbsolutePath());
