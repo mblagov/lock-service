@@ -74,7 +74,7 @@ public class LockControllerImpl implements LockFileController {
     }
 
     private String remakeFilePath(String originalPath) {
-        return originalPath.replace("/", "-");
+        return "/" + originalPath.replace("/", "-");
     }
 
     private boolean hasAlreadyLocked(String itemId) {
