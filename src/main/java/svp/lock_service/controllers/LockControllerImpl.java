@@ -12,15 +12,12 @@ import svp.lock_service.zk.ZKManagerImpl;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/locker")
 public class LockControllerImpl implements LockFileController {
 
     private static final String HDFS_NODENAME_PORT = "hdfs://n56:8020";
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     private ZKManagerImpl zkManager;
@@ -38,8 +35,8 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getSuccessResponse(itemId);
         }
 
-        itemId = remakeFilePath(itemId);
-        if (hasAlreadyLocked(itemId)) {
+        String zookeeperNodePath = remakeFilePath(itemId);
+        if (hasAlreadyLocked(zookeeperNodePath)) {
             return BaseResponse.getSuccessResponse(itemId);
         } else {
             return BaseResponse.getErrorResponse(itemId);
@@ -52,13 +49,13 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getErrorResponse(itemId);
         }
 
-        String newPath = remakeFilePath(itemId);
-        if (hasAlreadyLocked(newPath)) {
+        String zookeeperNodePath = remakeFilePath(itemId);
+        if (hasAlreadyLocked(zookeeperNodePath)) {
             return BaseResponse.getErrorResponse(itemId);
         }
 
-        zkManager.create(newPath, newPath);
-        return BaseResponse.getSuccessResponse(newPath);
+        zkManager.create(zookeeperNodePath, zookeeperNodePath);
+        return BaseResponse.getSuccessResponse(itemId);
     }
 
 
@@ -67,26 +64,17 @@ public class LockControllerImpl implements LockFileController {
             return BaseResponse.getErrorResponse(itemId);
         }
 
-        String newPath = remakeFilePath(itemId);
-        if (!hasAlreadyLocked(newPath)) {
+        String zookeeperNodePath = remakeFilePath(itemId);
+        if (!hasAlreadyLocked(zookeeperNodePath)) {
             return BaseResponse.getErrorResponse(itemId);
         }
 
-        zkManager.delete(newPath);
-        return BaseResponse.getSuccessResponse(newPath);
+        zkManager.delete(zookeeperNodePath);
+        return BaseResponse.getSuccessResponse(itemId);
     }
 
     private String remakeFilePath(String originalPath) {
-        originalPath = originalPath.substring(1, originalPath.length() - 1);
-
-        String[] pathParts = originalPath.split("/");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("/");
-
-        for (String pathPart : pathParts) {
-            stringBuilder.append(pathPart).append("-");
-        }
-        return stringBuilder.toString();
+        return originalPath.replace("/", "-");
     }
 
     private boolean hasAlreadyLocked(String itemId) {
