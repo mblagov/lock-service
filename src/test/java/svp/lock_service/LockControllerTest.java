@@ -56,7 +56,7 @@ public class LockControllerTest {
     // Zookeeper-1
     @Test
     public void accessFileTest_NoOneHoldLock_OneAccessesFile_ExpectSuccessfulAccess() throws Exception {
-        File file = new File("/");
+        File file = new File("/home");
         lockHelperRequest(file, givebackLockByFileEndpoint);
 
         BaseResponse responseModelForClient = lockHelperRequest(file, grabLockByFileEndpoint);
@@ -64,9 +64,9 @@ public class LockControllerTest {
     }
 
     // Zookeeper-2
-    @Test
+    /*@Test
     public void lockGrabTest_OneHoldLock_AnotherGrabsSame_ExpectNotGrabOnSecond() throws Exception {
-        File file = new File("/");
+        File file = new File("/home");
         BaseResponse responseModelForFirstClient = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForFirstClient.getStatus());
 
@@ -77,7 +77,7 @@ public class LockControllerTest {
     // Zookeeper-3
     @Test
     public void releaseLockTest_OneHoldLock_OneReleaseGrabbedLock_ExpectLockRelease() throws Exception {
-        File file = new File("/");
+        File file = new File("/home");
         BaseResponse grabResponseModel = lockHelperRequest(file, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, grabResponseModel.getStatus());
 
@@ -88,7 +88,7 @@ public class LockControllerTest {
     // Zookeeper-4
     @Test
     public void releaseNotHoldedLockTest_NoOneHoldLock_OneReleaseUnholdLock_ExpectNoLockReleased() throws Exception {
-        File file = new File("/");
+        File file = new File("/home");
 
         BaseResponse existsResponseModel = lockHelperRequest(file, existsLockByFileEndpoint);
 
@@ -107,7 +107,7 @@ public class LockControllerTest {
         File file = new File("noexisted.adaf");
         BaseResponse existsResponse = lockHelperRequest(file, existsLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, existsResponse.getStatus());
-    }
+    }*/
 
     private BaseResponse lockHelperRequest(File file, String endpoint) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get(localhost + endpoint + "?itemId=" + file.getAbsolutePath());
