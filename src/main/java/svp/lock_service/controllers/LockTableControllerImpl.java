@@ -14,12 +14,18 @@ import java.sql.SQLException;
 @RequestMapping("/tableLocker")
 public class LockTableControllerImpl implements LockTableController {
 
+    private static final String TABLE_DOESN_T_EXIST = "File doesn't exist on HDFS";
+    private static final String TABLE_IS_LOCKED = "Table is locked";
     @Autowired
     private ZKManagerImpl zkManager;
 
-    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) throws SQLException {
+    public BaseResponse isLockFree(@RequestParam(value = "itemId") String itemId) throws SQLException {
         if (!TableUtils.isTableExists(itemId)) {
-            return BaseResponse.getErrorResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId, TABLE_DOESN_T_EXIST);
+        }
+
+        if (hasAlreadyLocked(itemId)) {
+            return BaseResponse.getErrorResponse(itemId, TABLE_IS_LOCKED);
         }
         return BaseResponse.getSuccessResponse(itemId);
     }

@@ -14,7 +14,7 @@ public interface LockTableController {
      * @param itemId - имя таблице, которую мы хотим проверить
      */
     @GetMapping("/exists")
-    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) throws SQLException;
+    public BaseResponse isLockFree(@RequestParam(value = "itemId") String itemId) throws SQLException;
 
     /**
      * Попытаться взять блокировку на таблицу
