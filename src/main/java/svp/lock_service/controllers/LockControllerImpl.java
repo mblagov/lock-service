@@ -12,12 +12,16 @@ import svp.lock_service.zk.ZKManagerImpl;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/locker")
 public class LockControllerImpl implements LockFileController {
 
     private static final String HDFS_NODENAME_PORT = "hdfs://n56:8020";
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     private ZKManagerImpl zkManager;
@@ -50,7 +54,9 @@ public class LockControllerImpl implements LockFileController {
         }
 
         itemId = remakeFilePath(itemId);
-        System.out.println(itemId);
+
+        logger.log(Level.INFO, itemId);
+
         if (hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
