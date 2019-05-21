@@ -28,7 +28,7 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
     }
 
     public BaseResponse isLockFree(String itemId) throws IOException {
-        if (!hdfsHelper.isFileExistsInHDFS(itemId)) {
+        if (checkIfFileExistsInHdfs(itemId)) {
             return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
@@ -42,7 +42,7 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
 
     public BaseResponse grabLock(String itemId) throws IOException {
-        if (!hdfsHelper.isFileExistsInHDFS(itemId)) {
+        if (checkIfFileExistsInHdfs(itemId)) {
             return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
@@ -57,7 +57,7 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
 
     public BaseResponse giveLockBack(String itemId) throws IOException {
-        if (!hdfsHelper.isFileExistsInHDFS(itemId)) {
+        if (checkIfFileExistsInHdfs(itemId)) {
             return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
@@ -68,6 +68,10 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
         zkManager.delete(zookeeperNodePath);
         return BaseResponse.getSuccessResponse(itemId);
+    }
+
+    private boolean checkIfFileExistsInHdfs(String itemId) throws IOException {
+        return !hdfsHelper.isFileExistsInHDFS(itemId);
     }
 
     private String remakeFilePath(String originalPath) {
