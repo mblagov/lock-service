@@ -20,7 +20,6 @@ import svp.lock_service.models.BaseResponse;
 import svp.lock_service.models.Status;
 
 import javax.servlet.ServletContext;
-import java.io.File;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,6 +39,8 @@ public class LockControllerTest {
     private static final String grabLockByFileEndpoint = "/locker/grab";
     private static final String givebackLockByFileEndpoint = "/locker/giveback";
 
+    private String hdfsTestPath = "hdfs://n56:8020/user/students/kafka-reader/text.txt";
+
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -56,72 +57,67 @@ public class LockControllerTest {
     // Zookeeper-1
     @Test
     public void accessFileTest_NoOneHoldLock_OneAccessesFile_ExpectSuccessfulAccess() throws Exception {
-        File file = new File("/home");
-        lockHelperRequest(file, givebackLockByFileEndpoint);
+        lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
 
-        BaseResponse responseModelForClient = lockHelperRequest(file, grabLockByFileEndpoint);
+        BaseResponse responseModelForClient = lockHelperRequest(hdfsTestPath, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForClient.getStatus());
 
-        cleanUpGrabbedLock(file);
+        cleanUpGrabbedLock(hdfsTestPath);
     }
 
     // Zookeeper-2
     @Test
     public void lockGrabTest_OneHoldLock_AnotherGrabsSame_ExpectNotGrabOnSecond() throws Exception {
-        File file = new File("/home");
-        BaseResponse responseModelForFirstClient = lockHelperRequest(file, grabLockByFileEndpoint);
+        BaseResponse responseModelForFirstClient = lockHelperRequest(hdfsTestPath, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, responseModelForFirstClient.getStatus());
 
-        BaseResponse responseModelForSecondClient = lockHelperRequest(file, grabLockByFileEndpoint);
+        BaseResponse responseModelForSecondClient = lockHelperRequest(hdfsTestPath, grabLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, responseModelForSecondClient.getStatus());
 
-        cleanUpGrabbedLock(file);
+        cleanUpGrabbedLock(hdfsTestPath);
     }
 
     // Zookeeper-3
     @Test
     public void releaseLockTest_OneHoldLock_OneReleaseGrabbedLock_ExpectLockRelease() throws Exception {
-        File file = new File("/home");
-        BaseResponse grabResponseModel = lockHelperRequest(file, grabLockByFileEndpoint);
+        BaseResponse grabResponseModel = lockHelperRequest(hdfsTestPath, grabLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, grabResponseModel.getStatus());
 
-        BaseResponse givebackResponseModel = lockHelperRequest(file, givebackLockByFileEndpoint);
+        BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
         Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
     }
 
     // Zookeeper-4
     @Test
     public void releaseNotHoldedLockTest_NoOneHoldLock_OneReleaseUnholdLock_ExpectNoLockReleased() throws Exception {
-        File file = new File("/home");
-
-        BaseResponse existsResponseModel = lockHelperRequest(file, existsLockByFileEndpoint);
+        BaseResponse existsResponseModel = lockHelperRequest(hdfsTestPath, existsLockByFileEndpoint);
 
         if (existsResponseModel.getStatus().equals(Status.SUCCESS)) {
-            BaseResponse givebackResponseModel = lockHelperRequest(file, givebackLockByFileEndpoint);
+            BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
             Assert.assertEquals(Status.SUCCESS, givebackResponseModel.getStatus());
         }
 
-        BaseResponse givebackResponseModel = lockHelperRequest(file, givebackLockByFileEndpoint);
+        BaseResponse givebackResponseModel = lockHelperRequest(hdfsTestPath, givebackLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, givebackResponseModel.getStatus());
     }
 
     // Zookeeper-8
     @Test
     public void lockExists_NotExistedFile_ExpectError() throws Exception {
-        File file = new File("noexisted.adaf");
-        BaseResponse existsResponse = lockHelperRequest(file, existsLockByFileEndpoint);
+        String notExistingPath = "fjgoagpagagaha";
+        BaseResponse existsResponse = lockHelperRequest(notExistingPath, existsLockByFileEndpoint);
         Assert.assertEquals(Status.ERROR, existsResponse.getStatus());
     }
 
-    private BaseResponse lockHelperRequest(File file, String endpoint) throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = get(localhost + endpoint + "?itemId=" + file.getAbsolutePath());
+    private BaseResponse lockHelperRequest(String path, String endpoint) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = get(localhost + endpoint + "?itemId=" + path);
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
         return BaseResponse.fromJSON(mvcResult.getResponse().getContentAsString());
     }
 
-    private void cleanUpGrabbedLock(File file) {
+    private void cleanUpGrabbedLock(String path) {
         try {
-            lockHelperRequest(file, givebackLockByFileEndpoint);
+            lockHelperRequest(path, givebackLockByFileEndpoint);
         } catch (Exception e) {
             e.printStackTrace();
         }

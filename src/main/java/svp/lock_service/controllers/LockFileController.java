@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import svp.lock_service.models.BaseResponse;
 
+import java.io.IOException;
+
 public interface LockFileController {
 
     /**
@@ -12,7 +14,7 @@ public interface LockFileController {
      * @param itemId - путь к файлу, который хочется проверить
      */
     @GetMapping("/exists")
-    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId);
+    public BaseResponse lookAtLock(@RequestParam(value = "itemId") String itemId) throws IOException;
 
     /**
      * Попытаться взять блокировку на файл
@@ -20,7 +22,7 @@ public interface LockFileController {
      * @param itemId - путь к файлу
      */
     @GetMapping("/grab")
-    public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId);
+    public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId) throws IOException;
 
     /**
      * Попытаться отдать взятую клиентом блокировку
@@ -28,5 +30,5 @@ public interface LockFileController {
      * @param itemId - путь в взятому в блокировку файлу
      */
     @GetMapping("/giveback")
-    public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId);
+    public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId) throws IOException;
 }
