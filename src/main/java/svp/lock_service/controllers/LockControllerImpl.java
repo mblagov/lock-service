@@ -32,12 +32,12 @@ public class LockControllerImpl implements LockFileController {
 
     public BaseResponse lookAtLock(String itemId) throws IOException {
         if (!isFileExistsInHDFS(itemId)) {
-            return BaseResponse.getSuccessResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId);
         }
 
         String zookeeperNodePath = remakeFilePath(itemId);
         if (hasAlreadyLocked(zookeeperNodePath)) {
-            return BaseResponse.getSuccessResponse(itemId);
+            return BaseResponse.getErrorResponse(itemId);
         } else {
             return BaseResponse.getErrorResponse(itemId);
         }
