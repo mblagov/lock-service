@@ -110,13 +110,6 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
-                       <!-- <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>svp.lock_service.LockControllerTest</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>-->
                     </execution>
                 </executions>
             </plugin>

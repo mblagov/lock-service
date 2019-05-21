@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/locker")
+@RequestMapping("/filelocker")
 public class LockHDFSFileControllerImpl implements LockHDFSFileController {
 
     private static final String FILE_DOESN_T_EXIST_ON_HDFS = "File doesn't exist on HDFS";

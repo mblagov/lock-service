@@ -28,16 +28,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {LockServiceApplication.class})
 @WebAppConfiguration(value = "")
 @SpringBootTest
-public class LockControllerTest {
+public class LockHDFSFileControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
-    private static final String localhost = "http://localhost:8080";
-    private static final String existsLockByFileEndpoint = "/locker/checkfree";
-    private static final String grabLockByFileEndpoint = "/locker/grab";
-    private static final String givebackLockByFileEndpoint = "/locker/giveback";
+    private static final String localhost = "http://localhost:8080/filelocker";
+    private static final String existsLockByFileEndpoint = "/checkfree";
+    private static final String grabLockByFileEndpoint = "/grab";
+    private static final String givebackLockByFileEndpoint = "/giveback";
 
     private String hdfsTestPath = "hdfs://n56:8020/user/students/kafka-reader/text.txt";
 
