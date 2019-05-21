@@ -50,6 +50,7 @@ public class LockControllerImpl implements LockFileController {
         }
 
         itemId = remakeFilePath(itemId);
+        System.out.println(itemId);
         if (hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
