@@ -27,7 +27,7 @@ public class HiveHelper {
         String tableName = tableNameParts[1];
         getConnection(database);
         DatabaseMetaData metadata = connection.getMetaData();
-        ResultSet res = metadata.getTables(null, null, tableName, null);
+        ResultSet res = metadata.getTables(null, database, tableName, null);
         boolean ans = res.next();
         connection.close();
         return ans;
