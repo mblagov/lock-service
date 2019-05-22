@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import svp.lock_service.common.TableUtils;
 import svp.lock_service.models.BaseResponse;
 import svp.lock_service.zk.ZKManagerImpl;
 
