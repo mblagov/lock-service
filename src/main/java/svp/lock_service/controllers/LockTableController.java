@@ -13,7 +13,7 @@ public interface LockTableController {
      *
      * @param itemId - имя таблице, которую мы хотим проверить
      */
-    @GetMapping("/exists")
+    @GetMapping("/checkfree")
     public BaseResponse isLockFree(@RequestParam(value = "itemId") String itemId) throws SQLException;
 
     /**
