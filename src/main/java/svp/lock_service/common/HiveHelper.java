@@ -17,10 +17,6 @@ public class HiveHelper {
         }
     }
 
-    public String getTables() throws SQLException {
-        return connection.getMetaData().getTables(null, null, null, null).getString(1);
-    }
-
     public boolean isTableExists(String fullTableName) throws SQLException {
         String[] tableNameParts = fullTableName.split("\\.");
         String database = tableNameParts[0];
