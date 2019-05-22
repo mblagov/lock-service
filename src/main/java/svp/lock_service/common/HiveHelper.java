@@ -28,8 +28,9 @@ public class HiveHelper {
         getConnection(database);
         DatabaseMetaData metadata = connection.getMetaData();
         ResultSet res = metadata.getTables(null, null, tableName, null);
+        boolean ans = res.next();
         connection.close();
-        return res.next();
+        return ans;
     }
 
     private void getConnection(String database) throws SQLException {
