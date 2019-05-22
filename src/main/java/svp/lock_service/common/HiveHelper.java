@@ -23,7 +23,7 @@ public class HiveHelper {
     }
 
     public boolean isTableExists(String fullTableName) throws SQLException {
-        String[] tableNameParts = fullTableName.split(".");
+        String[] tableNameParts = fullTableName.split("\\.");
         System.out.println(fullTableName);
         String database = tableNameParts[0];
         String tableName = tableNameParts[1];
