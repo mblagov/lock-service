@@ -14,7 +14,7 @@ import java.sql.SQLException;
 @RequestMapping("/tableLocker")
 public class LockTableControllerImpl implements LockTableController {
 
-    private static final String TABLE_DOESN_T_EXIST = "File doesn't exist on HDFS";
+    private static final String TABLE_DOESN_T_EXIST = "Table doesn't exist in Hive";
     private static final String TABLE_IS_LOCKED = "Table is locked";
     @Autowired
     private ZKManagerImpl zkManager;
@@ -30,26 +30,28 @@ public class LockTableControllerImpl implements LockTableController {
             return BaseResponse.getErrorResponse(itemId, TABLE_DOESN_T_EXIST);
         }
 
-        String zookeeperNodePath = remakeFilePath(itemId);
-        if (hasAlreadyLocked(zookeeperNodePath)) {
+        String zkNodePath = remakeFilePath(itemId);
+        if (hasAlreadyLocked(zkNodePath)) {
             return BaseResponse.getErrorResponse(itemId, TABLE_IS_LOCKED);
         }
         return BaseResponse.getSuccessResponse(itemId);
     }
 
     public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId) throws SQLException {
-        /*if (!hiveHelper.isTableExists(itemId) || hasAlreadyLocked(itemId)) {
+        String zkNodePath = remakeFilePath(itemId);
+        if (!hiveHelper.isTableExists(itemId) || hasAlreadyLocked(zkNodePath)) {
             return BaseResponse.getErrorResponse(itemId);
         }
-        zkManager.create(itemId, itemId);*/
+        zkManager.create(zkNodePath, itemId);
         return BaseResponse.getSuccessResponse(itemId);
     }
 
     public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId) throws SQLException {
-       /* if (!hiveHelper.isTableExists(itemId) || !hasAlreadyLocked(itemId)) {
+        String zkNodePath = remakeFilePath(itemId);
+        if (!hiveHelper.isTableExists(itemId) || !hasAlreadyLocked(zkNodePath)) {
             return BaseResponse.getErrorResponse(itemId);
         }
-        zkManager.delete(itemId);*/
+        zkManager.delete(zkNodePath);
         return BaseResponse.getSuccessResponse(itemId);
     }
 

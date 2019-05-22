@@ -32,8 +32,8 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
             return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
-        String zookeeperNodePath = remakeFilePath(itemId);
-        if (hasAlreadyLocked(zookeeperNodePath)) {
+        String zkNodePath = remakeFilePath(itemId);
+        if (hasAlreadyLocked(zkNodePath)) {
             return BaseResponse.getErrorResponse(itemId, "File is locked");
         } else {
             return BaseResponse.getSuccessResponse(itemId);
@@ -46,12 +46,12 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
             return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
-        String zookeeperNodePath = remakeFilePath(itemId);
-        if (hasAlreadyLocked(zookeeperNodePath)) {
+        String zkNodePath = remakeFilePath(itemId);
+        if (hasAlreadyLocked(zkNodePath)) {
             return BaseResponse.getErrorResponse(itemId, FILE_ALREADY_LOCKED_BY_SOMEONE_ELSE);
         }
 
-        zkManager.create(zookeeperNodePath, zookeeperNodePath);
+        zkManager.create(zkNodePath, zkNodePath);
         return BaseResponse.getSuccessResponse(itemId);
     }
 
@@ -61,12 +61,12 @@ public class LockHDFSFileControllerImpl implements LockHDFSFileController {
             return BaseResponse.getErrorResponse(itemId, FILE_DOESN_T_EXIST_ON_HDFS);
         }
 
-        String zookeeperNodePath = remakeFilePath(itemId);
-        if (!hasAlreadyLocked(zookeeperNodePath)) {
+        String zkNodePath = remakeFilePath(itemId);
+        if (!hasAlreadyLocked(zkNodePath)) {
             return BaseResponse.getErrorResponse(itemId, FILE_ISN_T_LOCKED);
         }
 
-        zkManager.delete(zookeeperNodePath);
+        zkManager.delete(zkNodePath);
         return BaseResponse.getSuccessResponse(itemId);
     }
 
