@@ -77,6 +77,28 @@ public class LockTableControllerTest {
         cleanUpGrabbedLock(tableTestPath);
     }
 
+    // Zookeeper-7
+    @Test
+    public void releaseLockTest_OneHoldLock_OneReleaseGrabbedLock_ExpectLockRelease() throws Exception {
+        BaseResponse responseModel = lockHelperRequest(tableTestPath, grabLockByTableEndpoint);
+        Assert.assertEquals(Status.SUCCESS, responseModel.getStatus());
+
+        cleanUpGrabbedLock(tableTestPath);
+    }
+
+    // Zookeeper-11
+    @Test
+    public void releaseNotHoldedLockTest_NoOneHoldLock_OneReleaseUnholdLock_ExpectNoLockReleased() throws Exception {
+        BaseResponse checkLockFreeModelResponse = lockHelperRequest(tableTestPath, existsLockByTableEndpoint);
+
+        if (checkLockFreeModelResponse.getStatus().equals(Status.ERROR)) {
+            BaseResponse givebackResponseModel = lockHelperRequest(tableTestPath, givebackLockByTableEndpoint);
+            Assert.assertEquals(Status.SUCCESS,givebackResponseModel.getStatus());
+        }
+        cleanUpGrabbedLock(tableTestPath);
+    }
+
+
     private BaseResponse lockHelperRequest(String path, String endpoint) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get(localhost + endpoint + "?itemId=" + path);
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
