@@ -33,7 +33,7 @@ public class HiveHelper {
         return res.next();
     }
 
-    private void getConnection(String database) throws SQLException{
+    private void getConnection(String database) throws SQLException {
         connection = DriverManager.getConnection("jdbc:hive2://localhost:10000/" + database, "students", "students");
     }
 

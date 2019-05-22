@@ -30,26 +30,31 @@ public class LockTableControllerImpl implements LockTableController {
             return BaseResponse.getErrorResponse(itemId, TABLE_DOESN_T_EXIST);
         }
 
-        if (hasAlreadyLocked(itemId)) {
+        String zookeeperNodePath = remakeFilePath(itemId);
+        if (hasAlreadyLocked(zookeeperNodePath)) {
             return BaseResponse.getErrorResponse(itemId, TABLE_IS_LOCKED);
         }
         return BaseResponse.getSuccessResponse(itemId);
     }
 
     public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId) throws SQLException {
-        if (!hiveHelper.isTableExists(itemId) || hasAlreadyLocked(itemId)) {
+        /*if (!hiveHelper.isTableExists(itemId) || hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
-        zkManager.create(itemId, itemId);
+        zkManager.create(itemId, itemId);*/
         return BaseResponse.getSuccessResponse(itemId);
     }
 
     public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId) throws SQLException {
-        if (!hiveHelper.isTableExists(itemId) || !hasAlreadyLocked(itemId)) {
+       /* if (!hiveHelper.isTableExists(itemId) || !hasAlreadyLocked(itemId)) {
             return BaseResponse.getErrorResponse(itemId);
         }
-        zkManager.delete(itemId);
+        zkManager.delete(itemId);*/
         return BaseResponse.getSuccessResponse(itemId);
+    }
+
+    private String remakeFilePath(String originalPath) {
+        return "/" + originalPath.replace("/", "-");
     }
 
     private boolean hasAlreadyLocked(String itemId) {
