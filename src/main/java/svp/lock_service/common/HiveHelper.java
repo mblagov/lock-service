@@ -15,7 +15,6 @@ public class HiveHelper {
             e.printStackTrace();
             System.exit(1);
         }
-        connection = DriverManager.getConnection("jdbc:hive2://localhost:10000/default", "students", "students");
     }
 
     public String getTables() throws SQLException {
@@ -24,12 +23,12 @@ public class HiveHelper {
 
     public boolean isTableExists(String fullTableName) throws SQLException {
         String[] tableNameParts = fullTableName.split("\\.");
-        System.out.println(fullTableName);
         String database = tableNameParts[0];
         String tableName = tableNameParts[1];
         getConnection(database);
         DatabaseMetaData metadata = connection.getMetaData();
         ResultSet res = metadata.getTables(null, null, tableName, null);
+        connection.close();
         return res.next();
     }
 
