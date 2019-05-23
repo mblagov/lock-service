@@ -11,11 +11,13 @@ import svp.lock_service.zk.ZKManagerImpl;
 import java.sql.SQLException;
 
 @RestController
-@RequestMapping("/tableLocker")
+@RequestMapping("/tablelocker")
 public class LockTableControllerImpl implements LockTableController {
 
     private static final String TABLE_DOESN_T_EXIST = "Table doesn't exist in Hive";
     private static final String TABLE_IS_LOCKED = "Table is locked";
+    private static final String TABLE_ISN_T_LOCKED = "Table isn't locked";
+
     @Autowired
     private ZKManagerImpl zkManager;
 
@@ -39,18 +41,28 @@ public class LockTableControllerImpl implements LockTableController {
 
     public BaseResponse grabLock(@RequestParam(value = "itemId") String itemId) throws SQLException {
         String zkNodePath = remakeFilePath(itemId);
-        if (!hiveHelper.isTableExists(itemId) || hasAlreadyLocked(zkNodePath)) {
-            return BaseResponse.getErrorResponse(itemId);
+        if (!hiveHelper.isTableExists(itemId)) {
+            return BaseResponse.getErrorResponse(itemId, TABLE_DOESN_T_EXIST);
         }
+
+        if (hasAlreadyLocked(zkNodePath)) {
+            return BaseResponse.getErrorResponse(itemId, TABLE_IS_LOCKED);
+        }
+
         zkManager.create(zkNodePath, itemId);
         return BaseResponse.getSuccessResponse(itemId);
     }
 
     public BaseResponse giveLockBack(@RequestParam(value = "itemId") String itemId) throws SQLException {
         String zkNodePath = remakeFilePath(itemId);
-        if (!hiveHelper.isTableExists(itemId) || !hasAlreadyLocked(zkNodePath)) {
-            return BaseResponse.getErrorResponse(itemId);
+        if (!hiveHelper.isTableExists(itemId)) {
+            return BaseResponse.getErrorResponse(itemId, TABLE_DOESN_T_EXIST);
         }
+
+        if (!hasAlreadyLocked(zkNodePath)) {
+            return BaseResponse.getErrorResponse(itemId, TABLE_ISN_T_LOCKED);
+        }
+
         zkManager.delete(zkNodePath);
         return BaseResponse.getSuccessResponse(itemId);
     }

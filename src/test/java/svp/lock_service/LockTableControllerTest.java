@@ -34,7 +34,7 @@ public class LockTableControllerTest {
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
-    private static final String localhost = "http://localhost:8080/tableLocker";
+    private static final String localhost = "http://localhost:8080/tablelocker";
     private static final String existsLockByTableEndpoint = "/checkfree";
     private static final String grabLockByTableEndpoint = "/grab";
     private static final String givebackLockByTableEndpoint = "/giveback";
